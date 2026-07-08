@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>건설공사비지수</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { margin: 0; padding: 20px; font-family: sans-serif; }
+    .wrap { width: 100%; height: 560px; }
+    #status { font-size: 13px; color: #666; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <div id="status">데이터 불러오는 중...</div>
+  <div class="wrap">
+    <canvas id="chart"></canvas>
+  </div>
+
+  <script>
+    const API_URL = "YOUR_KOSIS_WORKER_URL";
+
+    const fieldList = [
+      {
+        targetId: "PRD",
+        targetValue: "",
+        prdValue: "M,202605,202604,202603,202602,202601,202512,202511,202510,202509,202508,202507,202506,202505,202504,202503,202502,202501,202412,202411,202410,202409,202408,202407,202406,202405,202404,202403,202402,202401,202312,202311,202310,202309,202308,202307,202306,202305,202304,202303,202302,202301,202212,202211,202210,202209,202208,202207,202206,202205,202204,202203,202202,202201,202112,202111,202110,202109,202108,202107,202106,202105,202104,202103,202102,202101,202012,202011,202010,202009,202008,202007,202006,202005,202004,202003,202002,202001,201912,201911,201910,201909,201908,201907,201906,201905,201904,201903,201902,201901,201812,201811,201810,201809,201808,201807,201806,201805,201804,201803,201802,201801,201712,201711,201710,201709,201708,201707,201706,@"
+      },
+      { targetId: "ITM_ID", targetValue: "16397AAA0", prdValue: "" },
+      { targetId: "OV_L1_ID", targetValue: "15397AA2AA", prdValue: "" },
+      { targetId: "OV_L1_ID", targetValue: "15397AA2AA1", prdValue: "" },
+      { targetId: "OV_L1_ID", targetValue: "15397AA2AA11", prdValue: "" },
+      { targetId: "OV_L1_ID", targetValue: "15397AA2AA12", prdValue: "" },
+      { targetId: "OV_L1_ID", targetValue: "15397AA2AA111", prdValue: "" },
+      { targetId: "OV_L1_ID", targetValue: "15397AA2AA121", prdValue: "" }
+    ];
+
+    const formData = new URLSearchParams({
+      orgId: "397",
+      tblId: "DT_39701_A003",
+      language: "ko",
+      fieldList: JSON.stringify(fieldList),
+      colAxis: "TIME",
+      rowAxis: "15397AA2",
+      isFirst: "N",
+      contextPath: "/statHtml",
+      vwCd: "MT_ZTITLE",
+      statId: "2004001",
+      dataOpt: "ko",
+      mobChk: "false",
+      view: "table",
+      periodStr: "M",
+      funcPrdSe: "M",
+      tblNm: "건설공사비지수(2020년기준)",
+      orderStr: "OV_L1_ID,TIME",
+      startNum: "1",
+      endNum: "648",
+      prdSort: "asc",
+      format: "json"
+    });
+
+    async function loadData() {
+      const status = document.getElementById("status");
+
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+        },
+        body: formData
+      });
+
+      const json = await res.json();
+      console.log("KOSIS response:", json);
+
+      const labels = json.result?.[0]?.lable || json.result?.lable || json.lable || [];
+      const rows = json.result?.[0]?.data || json.result?.data || json.data || [];
+
+      if (!labels.length || !rows.length) {
+        status.textContent = "데이터가 없습니다. Worker 또는 요청 파라미터를 확인하세요.";
+        return;
+      }
+
+      const wanted = [
+        "건설/소계/소계",
+        "건물건설 및 건축보수/주거용건물/소계",
+        "비주거용건물"
+      ];
+
+      const datasets = wanted.map(name => {
+        const row = rows.find(r => r.rowNm === name);
+        if (!row) return null;
+
+        return {
+          label: name,
+          data: row.rowData.map(v => Number(v)),
+          fill: false,
+          tension: 0.25
+        };
+      }).filter(Boolean);
+
+      if (!datasets.length) {
+        status.textContent = "표시할 시리즈를 찾지 못했습니다.";
+        return;
+      }
+
+      status.textContent = `업데이트 완료: ${labels[0]} ~ ${labels[labels.length - 1]}`;
+
+      new Chart(document.getElementById("chart"), {
+        type: "line",
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: "건설공사비지수(2020년=100)"
+            },
+            legend: { position: "bottom" }
+          },
+          scales: {
+            y: {
+              title: { display: true, text: "지수" }
+            }
+          }
+        }
+      });
+    }
+
+    loadData().catch(err => {
+      console.error(err);
+      document.getElementById("status").textContent =
+        "데이터를 불러오지 못했습니다: " + err;
+    });
+  </script>
+</body>
+</html>
