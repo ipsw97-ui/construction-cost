@@ -53,9 +53,11 @@
     formData.append("dataOpt", "ko");
     formData.append("view", "table");
     formData.append("mobChk", "false");
+
     formData.append("defaulPeriodArr", JSON.stringify({
       M: [202605,202604,202603,202602,202601,202512]
     }));
+
     formData.append("defaultClassArr", JSON.stringify([
       {
         objVarId: "15397AA2",
@@ -76,9 +78,11 @@
         classLvlCnt: 14
       }
     ]));
+
     formData.append("defaultItmArr", JSON.stringify([{ data: ["16397AAA0"] }]));
     formData.append("classAllArr", JSON.stringify([{ objVarId: "15397AA2", ovlSn: "1" }]));
     formData.append("classSet", JSON.stringify([{ objVarId: "15397AA2", ovlSn: "1", visible: "true" }]));
+
     formData.append("periodStr", "M");
     formData.append("funcPrdSe", "M");
     formData.append("tblNm", "건설공사비지수(2020년기준)");
@@ -88,6 +92,28 @@
     formData.append("reqCellCnt", "648");
     formData.append("prdSort", "asc");
     formData.append("format", "json");
+
+    formData.append("itemMultiply", "6");
+    formData.append("dimCo", "");
+    formData.append("obj_var_id", "");
+    formData.append("itm_id", "");
+    formData.append("mode", "");
+    formData.append("noSelect", "");
+    formData.append("table", "");
+    formData.append("tableType", "default");
+    formData.append("dataOpt2", "ko");
+    formData.append("enableLevelExpr", "Y");
+    formData.append("expDash", "Y");
+    formData.append("lastChk", "N");
+    formData.append("colClsAt", "N");
+    formData.append("analyzable", "true");
+    formData.append("selectAllFlag", "N");
+    formData.append("p_classAllChkYn", "N");
+    formData.append("p_classAllSelectYn", "N");
+    formData.append("tblIdFormInput", "");
+    formData.append("orgIdForm", "");
+    formData.append("prdSeForm", "");
+    formData.append("prdseSelect", "N");
 
     async function loadData() {
       const status = document.getElementById("status");
