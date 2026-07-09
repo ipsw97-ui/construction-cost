@@ -18,7 +18,7 @@
   </div>
 
   <script>
-    const API_URL = "https://hidden-sea-0a0a.ipsw97.workers.dev/";
+    const API_URL = "YOUR_KOSIS_WORKER_URL";
 
     const fieldList = [
       {
@@ -35,29 +35,59 @@
       { targetId: "OV_L1_ID", targetValue: "15397AA2AA121", prdValue: "" }
     ];
 
-    const formData = new URLSearchParams({
-      orgId: "397",
-      tblId: "DT_39701_A003",
-      language: "ko",
-      fieldList: JSON.stringify(fieldList),
-      colAxis: "TIME",
-      rowAxis: "15397AA2",
-      isFirst: "N",
-      contextPath: "/statHtml",
-      vwCd: "MT_ZTITLE",
-      statId: "2004001",
-      dataOpt: "ko",
-      mobChk: "false",
-      view: "table",
-      periodStr: "M",
-      funcPrdSe: "M",
-      tblNm: "건설공사비지수(2020년기준)",
-      orderStr: "OV_L1_ID,TIME",
-      startNum: "1",
-      endNum: "648",
-      prdSort: "asc",
-      format: "json"
-    });
+    const formData = new URLSearchParams();
+
+    formData.append("jsonStr", "");
+    formData.append("orgId", "397");
+    formData.append("tblId", "DT_39701_A003");
+    formData.append("language", "ko");
+    formData.append("fieldList", JSON.stringify(fieldList));
+    formData.append("colAxis", "TIME");
+    formData.append("rowAxis", "15397AA2");
+    formData.append("isFirst", "N");
+    formData.append("contextPath", "/statHtml");
+    formData.append("vwCd", "MT_ZTITLE");
+    formData.append("statId", "2004001");
+    formData.append("pubLog", "0");
+    formData.append("viewKind", "1");
+    formData.append("dataOpt", "ko");
+    formData.append("view", "table");
+    formData.append("mobChk", "false");
+    formData.append("defaulPeriodArr", JSON.stringify({
+      M: [202605,202604,202603,202602,202601,202512]
+    }));
+    formData.append("defaultClassArr", JSON.stringify([
+      {
+        objVarId: "15397AA2",
+        data: ["15397AA2AA","15397AA2AA1","15397AA2AA2"],
+        classType: 1,
+        classLvlCnt: 3
+      },
+      {
+        objVarId: "15397AA2",
+        data: ["15397AA2AA11","15397AA2AA12","15397AA2AA13","15397AA2AA21","15397AA2AA22","15397AA2AA23","15397AA2AA24"],
+        classType: 2,
+        classLvlCnt: 7
+      },
+      {
+        objVarId: "15397AA2",
+        data: ["15397AA2AA111","15397AA2AA121","15397AA2AA131","15397AA2AA211","15397AA2AA212","15397AA2AA213","15397AA2AA221","15397AA2AA222","15397AA2AA223","15397AA2AA224","15397AA2AA231","15397AA2AA232","15397AA2AA234","15397AA2AA241"],
+        classType: 3,
+        classLvlCnt: 14
+      }
+    ]));
+    formData.append("defaultItmArr", JSON.stringify([{ data: ["16397AAA0"] }]));
+    formData.append("classAllArr", JSON.stringify([{ objVarId: "15397AA2", ovlSn: "1" }]));
+    formData.append("classSet", JSON.stringify([{ objVarId: "15397AA2", ovlSn: "1", visible: "true" }]));
+    formData.append("periodStr", "M");
+    formData.append("funcPrdSe", "M");
+    formData.append("tblNm", "건설공사비지수(2020년기준)");
+    formData.append("orderStr", "OV_L1_ID,TIME");
+    formData.append("startNum", "1");
+    formData.append("endNum", "648");
+    formData.append("reqCellCnt", "648");
+    formData.append("prdSort", "asc");
+    formData.append("format", "json");
 
     async function loadData() {
       const status = document.getElementById("status");
@@ -73,11 +103,12 @@
       const json = await res.json();
       console.log("KOSIS response:", json);
 
-      const labels = json.result?.[0]?.lable || json.result?.lable || json.lable || [];
-      const rows = json.result?.[0]?.data || json.result?.data || json.data || [];
+      const result = Array.isArray(json.result) ? json.result[0] : json.result;
+      const labels = result?.lable || [];
+      const rows = result?.data || [];
 
       if (!labels.length || !rows.length) {
-        status.textContent = "데이터가 없습니다. Worker 또는 요청 파라미터를 확인하세요.";
+        status.textContent = "데이터가 없습니다. Console의 KOSIS response를 확인하세요.";
         return;
       }
 
